@@ -1,0 +1,835 @@
+/* ================================================================
+   style.css — Portfolio Landing Page
+   ================================================================
+
+   TABLE OF CONTENTS
+   -----------------
+   1.  CSS Variables (Themes)
+   2.  Reset & Base
+   3.  Sidebar Toggle Button
+   4.  Sidebar
+   5.  3-D Canvas Background
+   6.  Scroll-Snap Container
+   7.  Section Shared Styles
+   8.  Section Titles & Accents
+   9.  Scroll-Reveal Animations
+   10. Hero / Introduction
+   11. Languages Bar (inside hero)
+   12. Projects
+   13. Contact + Socials (merged)
+   14. Footer
+   15. Responsive
+
+   HOW TO CHANGE THEMES:
+     Edit the hex values inside :root[data-theme="dark"] or
+     :root[data-theme="light"] blocks below. Every color in
+     the site is derived from these variables.
+================================================================ */
+
+
+/* ================================================================
+   1. CSS VARIABLES — THEMES
+================================================================ */
+:root[data-theme="dark"] {
+  --bg-base:          #101420;   /* page / snap container background  */
+  --bg-surface:       #18202F;   /* cards, sidebar panel              */
+  --bg-raised:        #2A394A;   /* elevated elements, tag pills       */
+  --text-muted:       #4F5864;   /* labels, captions                  */
+  --text-base:        #8a95a3;   /* body copy                         */
+  --text-bright:      #c8d0dc;   /* headings                          */
+  --accent:           #4e9fff;   /* brand accent / interactive        */
+  --accent-2:         #a259ff;   /* secondary accent (contact bg)     */
+  --accent-glow:      rgba(78,159,255,.30);
+  --accent-2-glow:    rgba(162,89,255,.25);
+  --border:           rgba(255,255,255,.07);
+  --shadow:           0 8px 32px rgba(0,0,0,.55);
+  --sidebar-overlay:  rgba(16,20,32,.88);
+  --contact-orb-1:    rgba(78,159,255,.18);
+  --contact-orb-2:    rgba(162,89,255,.14);
+}
+
+:root[data-theme="light"] {
+  --bg-base:          #E4E6EC;
+  --bg-surface:       #f2f3f7;
+  --bg-raised:        #d0d3db;
+  --text-muted:       #7a818c;
+  --text-base:        #424B56;
+  --text-bright:      #22262E;
+  --accent:           #2563eb;
+  --accent-2:         #7c3aed;
+  --accent-glow:      rgba(37,99,235,.20);
+  --accent-2-glow:    rgba(124,58,237,.18);
+  --border:           rgba(0,0,0,.09);
+  --shadow:           0 8px 32px rgba(0,0,0,.12);
+  --sidebar-overlay:  rgba(228,230,236,.92);
+  --contact-orb-1:    rgba(37,99,235,.12);
+  --contact-orb-2:    rgba(124,58,237,.10);
+}
+
+
+/* ================================================================
+   2. RESET & BASE
+================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+
+body {
+  font-family: "Stack Sans Text", sans-serif;
+  background: var(--bg-base);
+  color: var(--text-base);
+  transition: background .4s, color .4s;
+  overflow: hidden;
+}
+
+/* ================================================================
+   SCROLL-SNAP CONTAINER
+   #snap-container is the real scroll host — position:fixed so it
+   fills the viewport regardless of browser/iframe context.
+   Sections inside get scroll-snap-align: start.
+
+   HOW TO LOOSEN snapping: change "mandatory" → "proximity".
+================================================================ */
+#snap-container {
+  position: fixed;
+  inset: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  /* stacking: below fixed overlays (sidebar, canvas, toggle) */
+  z-index: 1;
+}
+
+
+/* ================================================================
+   3. SIDEBAR TOGGLE BUTTON — sticky top-left
+   HOW TO MOVE: change `top` and `left` values.
+================================================================ */
+#sidebar-toggle {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 1000;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: var(--shadow);
+  transition: background .2s, transform .15s, box-shadow .2s;
+}
+#sidebar-toggle:hover {
+  background: var(--bg-raised);
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Hamburger bars */
+#sidebar-toggle .bar {
+  width: 20px; height: 2px;
+  background: var(--text-bright);
+  border-radius: 2px;
+  transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .25s;
+}
+body.sidebar-open #sidebar-toggle .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+body.sidebar-open #sidebar-toggle .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+body.sidebar-open #sidebar-toggle .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+
+/* ================================================================
+   4. SIDEBAR
+================================================================ */
+#sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 100%;
+  width: 268px;
+  background: var(--sidebar-overlay);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border-right: 1px solid var(--border);
+  z-index: 999;
+  padding: 82px 28px 44px;
+  transform: translateX(-100%);
+  transition: transform .38s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+body.sidebar-open #sidebar { transform: translateX(0); }
+
+#sidebar .sidebar-label {
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 20px 0 6px;
+  font-weight: 700;
+}
+
+#sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  text-decoration: none;
+  color: var(--text-base);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background .2s, color .2s, transform .15s;
+}
+#sidebar a:hover {
+  background: var(--bg-raised);
+  color: var(--text-bright);
+  transform: translateX(4px);
+}
+
+/* Active nav highlight */
+#sidebar a.active {
+  background: var(--bg-raised);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Theme toggle button at the bottom of sidebar */
+#theme-btn {
+  margin-top: auto;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text-bright);
+  cursor: pointer;
+  font-family: "Stack Sans Text", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-align: left;
+  transition: background .2s, color .2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#theme-btn:hover { background: var(--accent); color: #fff; }
+
+/* Sidebar click-outside backdrop */
+#sidebar-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 998;
+}
+body.sidebar-open #sidebar-backdrop { display: block; }
+
+
+/* ================================================================
+   5. 3-D CANVAS BACKGROUND (fixed, behind everything)
+================================================================ */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;   /* behind #snap-container's content but visible through it */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+body.scrolled #bg-canvas { opacity: 1; }
+
+
+/* ================================================================
+   6. SECTIONS — direct children of #snap-container
+   section and footer both get scroll-snap-align: start
+================================================================ */
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Every section snaps to start */
+section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;     /* prevents skipping sections */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+/* ================================================================
+   7–8. SECTION TITLES & SHARED ANIMATION BASE STYLES
+   Items start invisible; JS adds .revealed to trigger animations.
+================================================================ */
+
+/* Section heading */
+.section-title {
+  font-family: "Bungee", cursive;
+  font-size: clamp(1.9rem, 5vw, 3.2rem);
+  color: var(--text-bright);
+  letter-spacing: .04em;
+  margin-bottom: 12px;
+  /* reveal animation base */
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.section-title.revealed { opacity: 1; transform: translateY(0); }
+
+.section-sub {
+  font-size: .97rem;
+  color: var(--text-muted);
+  max-width: 520px;
+  line-height: 1.75;
+  margin-bottom: 48px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .6s ease .12s, transform .6s ease .12s;
+}
+.section-sub.revealed { opacity: 1; transform: translateY(0); }
+
+.accent-line {
+  width: 52px; height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  margin: 0 auto 36px;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: opacity .5s ease .08s, transform .5s ease .08s;
+}
+.accent-line.revealed { opacity: 1; transform: scaleX(1); }
+
+
+/* ================================================================
+   9. SCROLL-REVEAL ANIMATIONS
+   Applied by IntersectionObserver in main.js.
+   
+   .reveal-up    — slides up from below
+   .reveal-left  — slides in from the left
+   .reveal-right — slides in from the right
+   .reveal-pop   — scales up from 90 %
+   
+   Staggered siblings use CSS --delay variable set by JS.
+================================================================ */
+
+/* Base hidden state */
+.reveal-up, .reveal-left, .reveal-right, .reveal-pop {
+  opacity: 0;
+  transition:
+    opacity  .55s ease var(--delay, 0s),
+    transform .55s cubic-bezier(.22,1,.36,1) var(--delay, 0s);
+}
+.reveal-up    { transform: translateY(40px); }
+.reveal-left  { transform: translateX(-40px); }
+.reveal-right { transform: translateX(40px); }
+.reveal-pop   { transform: scale(.88); }
+
+/* Revealed state */
+.reveal-up.revealed,
+.reveal-left.revealed,
+.reveal-right.revealed,
+.reveal-pop.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+
+/* ================================================================
+   10. HERO / INTRODUCTION
+================================================================ */
+#home { background: var(--bg-base); }
+
+.hero-logo {
+  width: 90px; height: 90px;
+  border-radius: 24px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 28px;
+  box-shadow: 0 0 40px var(--accent-glow);
+  animation: pulse-glow 3.5s ease-in-out infinite;
+  /* reveal */
+  opacity: 0;
+  transform: scale(.7);
+  transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1);
+}
+.hero-logo.revealed { opacity: 1; transform: scale(1); }
+
+@keyframes pulse-glow {
+  0%,100% { box-shadow: 0 0 24px var(--accent-glow); }
+  50%      { box-shadow: 0 0 56px var(--accent-glow), 0 0 80px var(--accent-2-glow); }
+}
+
+.hero-logo svg { width: 50px; height: 50px; }
+
+/* HOW TO CHANGE: edit your name and tagline in index.html */
+.hero-title {
+  font-family: "Bungee", cursive;
+  font-size: clamp(2.6rem, 8vw, 5.2rem);
+  color: var(--text-bright);
+  line-height: 1.05;
+  letter-spacing: -.01em;
+  margin-bottom: 18px;
+}
+.hero-title span { color: var(--accent); }
+
+.hero-sub {
+  font-size: clamp(.97rem, 2.2vw, 1.15rem);
+  color: var(--text-muted);
+  max-width: 560px;
+  line-height: 1.78;
+  margin-bottom: 38px;
+}
+
+.hero-cta {
+  display: inline-flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 56px;
+}
+
+/* Shared button styles */
+.btn {
+  padding: 13px 30px;
+  border-radius: 10px;
+  font-family: "Stack Sans Text", sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .06em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform .15s, box-shadow .2s, background .2s;
+  border: none;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 22px var(--accent-glow);
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 30px var(--accent-glow); }
+.btn-outline {
+  background: transparent;
+  color: var(--text-bright);
+  border: 1.5px solid var(--border);
+}
+.btn-outline:hover { background: var(--bg-raised); transform: translateY(-3px); }
+
+/* Floating particles */
+.particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .3;
+  animation: float-up linear infinite;
+}
+@keyframes float-up {
+  0%   { transform: translateY(105vh) scale(0); opacity: 0; }
+  8%   { opacity: .35; }
+  92%  { opacity: .15; }
+  100% { transform: translateY(-8vh)  scale(1.2); opacity: 0; }
+}
+
+
+/* ================================================================
+   11. LANGUAGES BAR — compact strip inside the hero section
+================================================================ */
+.langs-strip {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.lang-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;           /* pill shape */
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  color: var(--text-bright);
+  cursor: default;
+  transition: background .2s, border-color .2s, transform .2s, box-shadow .2s;
+}
+.lang-pill:hover {
+  background: var(--bg-raised);
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px var(--accent-glow);
+}
+.lang-pill img,
+.lang-pill svg {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+}
+
+.langs-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  width: 100%;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+
+/* ================================================================
+   12. PROJECTS
+================================================================ */
+#projects { background: var(--bg-base); }
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 22px;
+  width: 100%;
+  max-width: 980px;
+  text-align: left;
+}
+
+.project-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 26px;
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+}
+.project-card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 14px 40px var(--accent-glow);
+  border-color: var(--accent);
+}
+
+.project-icon {
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  background: var(--bg-raised);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+  font-size: 22px;
+}
+.project-title {
+  font-family: "Archivo Black", sans-serif;
+  font-size: 1.05rem;
+  color: var(--text-bright);
+  margin-bottom: 8px;
+}
+.project-desc {
+  font-size: .875rem;
+  color: var(--text-muted);
+  line-height: 1.68;
+  margin-bottom: 16px;
+}
+.project-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 18px; }
+.tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: var(--bg-raised);
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
+.project-link {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: .05em;
+}
+.project-link:hover { text-decoration: underline; }
+
+
+/* ================================================================
+   13. CONTACT + SOCIALS (merged section)
+   
+   Unique background: layered mesh gradient + floating orbs +
+   a subtle grid overlay that shifts with scroll (JS-driven).
+================================================================ */
+#contact {
+  /* Remove default centering override — we handle it manually */
+  justify-content: center;
+  padding: 100px 40px 80px;
+  background: var(--bg-base);
+  overflow: hidden;
+}
+
+/* Decorative background orbs — pure CSS, no images needed */
+#contact::before,
+#contact::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: orb-drift 12s ease-in-out infinite alternate;
+}
+#contact::before {
+  width: 520px; height: 520px;
+  background: var(--contact-orb-1);
+  top: -160px; left: -120px;
+}
+#contact::after {
+  width: 440px; height: 440px;
+  background: var(--contact-orb-2);
+  bottom: -130px; right: -100px;
+  animation-delay: -6s;
+}
+@keyframes orb-drift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(40px,30px) scale(1.08); }
+}
+
+/* Dot-grid overlay for texture */
+#contact .contact-grid-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  opacity: .6;
+}
+
+/* Inner layout: left = socials column, right = form */
+.contact-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 40px;
+  width: 100%;
+  max-width: 900px;
+  align-items: start;
+}
+
+/* ---- SOCIALS column (left) ---- */
+.socials-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+.socials-col-title {
+  font-family: "Bungee", cursive;
+  font-size: 1rem;
+  color: var(--text-bright);
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+.socials-col-sub {
+  font-size: .82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.social-row-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: transform .22s, box-shadow .22s, border-color .22s;
+}
+.social-row-card:hover {
+  transform: translateX(6px);
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+.social-row-card svg { width: 26px; height: 26px; flex-shrink: 0; }
+.social-row-info { display: flex; flex-direction: column; gap: 2px; }
+.social-row-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-bright);
+}
+.social-row-handle {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: .03em;
+}
+
+/* ---- FORM column (right) ---- */
+.contact-form-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+.form-title {
+  font-family: "Bungee", cursive;
+  font-size: 1.3rem;
+  color: var(--text-bright);
+  letter-spacing: .04em;
+  margin-bottom: 4px;
+}
+.form-sub {
+  font-size: .85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.field-input {
+  width: 100%;
+  padding: 11px 15px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-base);
+  color: var(--text-bright);
+  font-family: "Stack Sans Text", sans-serif;
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.field-input::placeholder { color: var(--text-muted); opacity: .7; }
+textarea.field-input { resize: vertical; min-height: 112px; }
+
+.send-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-family: "Stack Sans Text", sans-serif;
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .2s;
+  box-shadow: 0 4px 22px var(--accent-glow);
+}
+.send-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px var(--accent-glow); }
+
+#form-status {
+  font-size: 12.5px;
+  text-align: center;
+  display: none;
+  min-height: 20px;
+}
+
+/* Section header above the two-col layout */
+.contact-header {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  margin-bottom: 36px;
+  text-align: center;
+  width: 100%;
+  max-width: 900px;
+}
+
+
+/* ================================================================
+   14. FOOTER
+================================================================ */
+footer {
+  position: relative;
+  z-index: 1;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  padding: 12px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  min-height: 50px;
+  justify-content: center;
+  /* snap */
+  scroll-snap-align: start;
+}
+
+.footer-logo {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  background: var(--bg-raised);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 22px var(--accent-glow);
+  animation: pulse-glow 3.5s ease-in-out infinite;
+}
+.footer-logo svg { width: 28px; height: 28px; }
+
+.footer-copy {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+.footer-copy span { color: var(--accent); font-weight: 700; }
+
+
+/* ================================================================
+   15. RESPONSIVE
+================================================================ */
+@media (max-width: 860px) {
+  .contact-inner {
+    grid-template-columns: 1fr;
+  }
+  .socials-col { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+  .socials-col-title, .socials-col-sub { width: 100%; }
+  .social-row-card { flex: 1 1 calc(50% - 5px); min-width: 140px; }
+}
+
+@media (max-width: 640px) {
+  section { padding: 88px 18px 64px; }
+  #contact { padding: 88px 18px 64px; }
+  .contact-form-wrap { padding: 26px 20px; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: 2.1rem; }
+  .social-row-card { flex: 1 1 100%; }
+}
+
+@media (max-width: 400px) {
+  .lang-pill span { display: none; }          /* show only icon on tiny screens */
+  .lang-pill { padding: 6px 10px; }
+}
